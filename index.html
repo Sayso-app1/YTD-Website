@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>YouTheDriver · Fatigue prediction for truck drivers</title>
+<meta name="description" content="YouTheDriver is an app for truck drivers that reads the wearable already on their wrist, predicts fatigue before it becomes a microsleep, and rewards healthy, rested habits.">
+<link rel="icon" type="image/png" href="ytd-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800;900&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=Barlow+Condensed:wght@500;600;700&amp;display=swap">
+<style>
+html{scroll-behavior:smooth}body{margin:0;background:#22272A;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#2D3235}
+a{color:#2F7A27;text-decoration:none}a:hover{color:#23601D}
+@keyframes ytd-d52{to{stroke-dashoffset:-52}}
+@keyframes ytd-d48{to{stroke-dashoffset:-48}}
+@keyframes ytd-d34{to{stroke-dashoffset:-34}}
+@keyframes ytd-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes ytd-needle{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(7deg)}}
+@keyframes ytd-blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ytd-ring{0%{box-shadow:0 0 0 8px #D6EBD2,0 0 0 8px rgba(64,156,53,.45)}80%,100%{box-shadow:0 0 0 8px #D6EBD2,0 0 0 24px rgba(64,156,53,0)}}
+@keyframes ytd-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ytd-up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes ytd-left{from{opacity:0;transform:translateX(-48px)}to{opacity:1;transform:none}}
+@keyframes ytd-right{from{opacity:0;transform:translateX(48px)}to{opacity:1;transform:none}}
+@keyframes ytd-pulse{0%{box-shadow:0 0 0 0 rgba(64,156,53,.45)}80%,100%{box-shadow:0 0 0 18px rgba(64,156,53,0)}}
+.ytd-pulse{animation:ytd-pulse 2.6s ease-out infinite}
+@keyframes ytd-drive{from{transform:translateX(-40px)}to{transform:translateX(1220px)}}
+.ytd-drive{animation:ytd-drive 16s linear infinite}
+.ytd-d52{animation:ytd-d52 1.6s linear infinite}
+.ytd-d48{animation:ytd-d48 2.4s linear infinite}
+.ytd-d34{animation:ytd-d34 2.6s linear infinite}
+.ytd-bob{animation:ytd-bob 6s ease-in-out infinite}
+.ytd-bob2{animation:ytd-bob 6s ease-in-out -3s infinite}
+.ytd-needle{transform-box:view-box;transform-origin:100px 100px;animation:ytd-needle 5s ease-in-out infinite}
+.ytd-blink{animation:ytd-blink 2.4s ease-in-out infinite}
+.ytd-ring{animation:ytd-ring 2.4s ease-out infinite}
+.ytd-fill{transform-origin:left center;animation:ytd-fill 1.4s cubic-bezier(.2,.7,.2,1) .5s both}
+.ytd-in{animation:ytd-up .8s cubic-bezier(.2,.7,.2,1) both}
+.ytd-lift{transition:transform .25s ease,box-shadow .25s ease}
+.ytd-lift:hover{transform:translateY(-5px);box-shadow:0 16px 32px rgba(34,39,42,.14)}
+.ytd-hl{transition:box-shadow .25s ease,border-color .25s ease}
+.ytd-hl:hover{box-shadow:0 16px 32px rgba(34,39,42,.12);border-color:#409C35!important}
+.ytd-btn{transition:transform .2s ease,filter .2s ease}
+.ytd-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.ytd-arrow{transition:transform .2s ease}
+.ytd-btn:hover .ytd-arrow{transform:translateX(4px)}
+@supports (animation-timeline: view()){
+.ytd-rv,.ytd-rv2,.ytd-rv3,.ytd-rv4{animation:ytd-up linear both;animation-timeline:view()}
+.ytd-rv{animation-range:entry 0% entry 80%}
+.ytd-rv2{animation-range:entry 10% entry 90%}
+.ytd-rv3{animation-range:entry 20% entry 100%}
+.ytd-rv4{animation-range:entry 30% entry 100%}
+.ytd-rvl{animation:ytd-left linear both;animation-timeline:view();animation-range:entry 0% entry 90%}
+.ytd-rvr{animation:ytd-right linear both;animation-timeline:view();animation-range:entry 0% entry 90%}
+}
+@media (prefers-reduced-motion: reduce){
+*,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div style="width: 1440px; height: 7836px; margin: 0 auto; background: #ffffff; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #2D3235; display: flex; flex-direction: column; overflow: hidden">
+
+<!-- ============ HERO ============ -->
+<section id="top" style="position: relative; height: 880px; flex-shrink: 0; background: #2D3235; overflow: hidden">
+  <svg style="position: absolute; right: 0; top: 96px" width="860" height="784" viewBox="0 0 860 784" aria-hidden="true">
+    <line x1="0" y1="140" x2="860" y2="140" stroke="#3B4245" stroke-width="2"></line>
+    <polygon points="540,140 580,140 1080,784 60,784" fill="#363C3F"></polygon>
+    <line x1="540" y1="140" x2="60" y2="784" stroke="#E9E9E9" stroke-opacity="0.35" stroke-width="4"></line>
+    <line x1="580" y1="140" x2="1080" y2="784" stroke="#E9E9E9" stroke-opacity="0.35" stroke-width="4"></line>
+    <line class="ytd-d52" x1="560" y1="150" x2="570" y2="784" stroke="#F2B53A" stroke-opacity="0.75" stroke-width="7" stroke-dasharray="22 30"></line>
+  </svg>
+  <svg style="position: absolute; left: 0; bottom: 0" width="1440" height="90" viewBox="0 0 1440 90" aria-hidden="true">
+    <line class="ytd-d48" x1="0" y1="56" x2="1440" y2="-14" stroke="#F2B53A" stroke-opacity="0.55" stroke-width="5" stroke-dasharray="20 28"></line>
+    <line x1="0" y1="80" x2="1440" y2="10" stroke="#E9E9E9" stroke-opacity="0.3" stroke-width="3"></line>
+    <polygon points="0,90 1440,20 1440,90" fill="#EEF0ED"></polygon>
+  </svg>
+
+  <nav style="position: absolute; left: 0; top: 0; width: 1440px; height: 96px; box-sizing: border-box; padding: 0 120px; display: flex; align-items: center; justify-content: space-between">
+    <a href="#top" style="display: flex; align-items: center; gap: 12px; text-decoration: none">
+      <img src="ytd-icon.png" alt="YouTheDriver logo" style="width: 44px; height: 40px">
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 24px; color: #ffffff; letter-spacing: -0.3px">YouThe<span style="color: #6CC25E">Driver</span></span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 36px">
+      <a href="#how" style="color: #D4D9DB; font-size: 15px; font-weight: 500">How it works</a>
+      <a href="#app" style="color: #D4D9DB; font-size: 15px; font-weight: 500">The app</a>
+      <a href="#health" style="color: #D4D9DB; font-size: 15px; font-weight: 500">Health</a>
+      <a href="#carriers" style="color: #D4D9DB; font-size: 15px; font-weight: 500">For carriers</a>
+      <a href="#who" style="color: #D4D9DB; font-size: 15px; font-weight: 500">For insurers</a>
+      <a href="#who" class="ytd-btn" style="display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 10px; background: #2F7A27; color: #ffffff; font-size: 15px; font-weight: 600">Join the pilot</a>
+    </div>
+  </nav>
+
+  <div style="position: absolute; left: 120px; top: 176px; width: 620px; display: flex; flex-direction: column; gap: 28px">
+    <div class="ytd-in" style="display: flex">
+      <span style="display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #E9E9E9; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.6px; color: #ffffff">IT'S YOU BEHIND THE WHEEL</span>
+    </div>
+    <h1 class="ytd-in" style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 66px; line-height: 1.04; letter-spacing: -1.5px; color: #ffffff; animation-delay: 0.1s">Catch fatigue before the rumble strip does.</h1>
+    <p class="ytd-in" style="margin: 0; font-size: 20px; line-height: 1.55; color: #C6CCCF; animation-delay: 0.2s">YouTheDriver is an app for truck drivers that reads the wearable already on their wrist, predicts fatigue before it becomes a microsleep, and rewards the healthy, rested habits that keep them safe on the road.</p>
+    <div class="ytd-in" style="display: flex; gap: 14px; flex-wrap: wrap; animation-delay: 0.3s">
+      <a href="#who" class="ytd-btn" style="display: inline-flex; align-items: center; gap: 10px; height: 56px; padding: 0 26px; border-radius: 12px; background: #409C35; color: #ffffff; font-size: 17px; font-weight: 600">
+        Join the driver waitlist
+        <svg class="ytd-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+      </a>
+      <a href="#who" class="ytd-btn" style="display: inline-flex; align-items: center; height: 56px; padding: 0 26px; border-radius: 12px; border: 2px solid #6B7478; color: #ffffff; font-size: 17px; font-weight: 600">Run a free fleet pilot</a>
+    </div>
+    <a href="#who" class="ytd-in" style="color: #8FD384; font-size: 16px; font-weight: 500; animation-delay: 0.4s">Insurers and brokers: partner with us at no cost →</a>
+    <div class="ytd-in" style="display: flex; gap: 28px; padding-top: 8px; animation-delay: 0.5s">
+      <div style="display: flex; align-items: center; gap: 8px; color: #C6CCCF; font-size: 15px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6CC25E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M9.5 5H15l1.5 2H20a1 1 0 0 1 1 1v9M17 19H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h2"></path></svg>
+        No cameras
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; color: #C6CCCF; font-size: 15px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6CC25E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M9 9v2a3 3 0 0 0 5 2.2M15 9.5V6a3 3 0 0 0-5.7-1.3M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11 5.7M12 18v3"></path></svg>
+        No audio
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; color: #C6CCCF; font-size: 15px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6CC25E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="4"></circle><path d="M3 21a7 7 0 0 1 14 0M16 11l2 2 4-4"></path></svg>
+        The driver owns the data
+      </div>
+    </div>
+  </div>
+
+  <!-- hero phone: Home -->
+  <div class="ytd-in" style="animation-delay: 0.25s; animation-duration: 1s; position: absolute; left: 900px; top: 170px; width: 320px; height: 660px; box-sizing: border-box; border-radius: 44px; background: #1B1F21; padding: 10px; box-shadow: 0 30px 60px rgba(0,0,0,0.45)">
+    <div style="width: 300px; height: 640px; border-radius: 34px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box; padding: 22px 14px 0">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <img src="ytd-icon.png" alt="" style="width: 32px; height: 29px">
+          <div style="display: flex; flex-direction: column">
+            <span style="font-size: 10px; color: #5E6569">Good evening</span>
+            <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 15px">Dale</span>
+          </div>
+        </div>
+        <span style="width: 30px; height: 30px; border-radius: 15px; border: 1px solid #DADDD8; display: flex; align-items: center; justify-content: center; color: #2D3235">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"></path><path d="M10 21h4"></path></svg>
+        </span>
+      </div>
+      <div style="margin-top: 12px; padding: 12px; border-radius: 16px; background: #F3F4F2; display: flex; flex-direction: column; align-items: center; gap: 4px">
+        <div style="width: 100%; display: flex; justify-content: space-between">
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; color: #3F4548">FATIGUE METER</span>
+          <span style="font-size: 10px; color: #2F7A27; font-weight: 600"><span class="ytd-blink">●</span> Watch connected</span>
+        </div>
+        <svg width="190" height="104" viewBox="0 0 200 110" aria-hidden="true">
+          <path d="M20 100 A80 80 0 0 1 60 30.72" fill="none" stroke="#D9534F" stroke-width="16"></path>
+          <path d="M62.5 29.3 A80 80 0 0 1 137.5 29.3" fill="none" stroke="#F2B53A" stroke-width="16"></path>
+          <path d="M140 30.72 A80 80 0 0 1 180 100" fill="none" stroke="#409C35" stroke-width="16"></path>
+          <line class="ytd-needle" x1="100" y1="100" x2="92" y2="40" stroke="#2D3235" stroke-width="4" stroke-linecap="round"></line>
+          <circle cx="100" cy="100" r="7" fill="#ffffff" stroke="#2D3235" stroke-width="4"></circle>
+        </svg>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 26px; line-height: 1">46<span style="font-size: 12px; color: #5E6569"> /100</span></span>
+        <span style="margin-top: 4px; padding: 4px 12px; border-radius: 12px; background: #F2B53A; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px">▲ YELLOW · CAUTION</span>
+      </div>
+      <div style="margin-top: 10px; padding: 12px; border-radius: 16px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between">
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; color: #3F4548">DO THIS NEXT</span>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.8px; color: #8A6A12">ALERTNESS DROPPING</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <span style="width: 28px; height: 28px; border-radius: 8px; background: #FCEFCF; display: flex; align-items: center; justify-content: center; color: #8A6A12"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"></path><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 3v3M12 3v3"></path></svg></span>
+          <div style="display: flex; flex-direction: column"><span style="font-size: 12px; font-weight: 600">Take a 15–20 minute break</span><span style="font-size: 10px; color: #5E6569">Pull over at a safe stop within 30 min</span></div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <span style="width: 28px; height: 28px; border-radius: 8px; background: #FCEFCF; display: flex; align-items: center; justify-content: center; color: #8A6A12"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg></span>
+          <div style="display: flex; flex-direction: column"><span style="font-size: 12px; font-weight: 600">Rest area in 12 miles</span><span style="font-size: 10px; color: #5E6569">Truck spaces open now</span></div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <span style="width: 28px; height: 28px; border-radius: 8px; background: #FCEFCF; display: flex; align-items: center; justify-content: center; color: #8A6A12"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg></span>
+          <div style="display: flex; flex-direction: column"><span style="font-size: 12px; font-weight: 600">Hydrate and eat light</span><span style="font-size: 10px; color: #5E6569">Water and protein, skip the sugar</span></div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 2px">
+          <span style="flex-grow: 1; height: 32px; border-radius: 9px; background: #2F7A27; color: #ffffff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Start break timer</span>
+          <span style="flex-grow: 1; height: 32px; border-radius: 9px; border: 1.5px solid #2F7A27; color: #2F7A27; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center">Find parking</span>
+        </div>
+      </div>
+      <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+        <div style="padding: 8px; border-radius: 10px; background: #F3F4F2; display: flex; flex-direction: column"><span style="font-size: 9px; color: #5E6569">Last break</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">3h 10m</span></div>
+        <div style="padding: 8px; border-radius: 10px; background: #F3F4F2; display: flex; flex-direction: column"><span style="font-size: 9px; color: #5E6569">Heart rate</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">72 bpm</span></div>
+        <div style="padding: 8px; border-radius: 10px; background: #F3F4F2; display: flex; flex-direction: column"><span style="font-size: 9px; color: #5E6569">Sleep</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px">6h 20m</span></div>
+      </div>
+      <div style="margin-top: auto; margin-left: -14px; margin-right: -14px; height: 58px; border-top: 1px solid #E3E6E1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #2F7A27"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path></svg><span style="font-size: 9px; font-weight: 600">Home</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6B7478"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"></rect><path d="M10 16V8h3a2.5 2.5 0 0 1 0 5h-3"></path></svg><span style="font-size: 9px">Parking</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6B7478"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"></path></svg><span style="font-size: 9px">Community</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6B7478"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"></path><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4"></path></svg><span style="font-size: 9px">Wellness</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #6B7478"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg><span style="font-size: 9px">Voice</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- floating chips -->
+  <div class="ytd-bob" style="position: absolute; left: 730px; top: 290px; width: 200px; box-sizing: border-box; padding: 14px 16px; border-radius: 14px; background: #3A4144; border: 1px solid #4B5357; box-shadow: 0 12px 28px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 4px">
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.4px; color: #AEB5B8">3:14 A.M. · I-70</span>
+    <span style="font-size: 15px; font-weight: 600; color: #ffffff">Hour 10 of 14</span>
+    <span style="font-size: 13px; color: #C6CCCF">The ELD says he's legal.</span>
+  </div>
+  <div class="ytd-bob2" style="position: absolute; left: 1160px; top: 590px; width: 214px; box-sizing: border-box; padding: 14px 16px; border-radius: 14px; background: #F2B53A; box-shadow: 0 12px 28px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 4px">
+    <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.4px; color: #4A3A0F">YTD CAUGHT IT</span>
+    <span style="font-size: 15px; font-weight: 600; color: #2D3235">His body disagrees.</span>
+    <span style="font-size: 13px; color: #3E3413">Break suggested, 12 mi ahead.</span>
+  </div>
+</section>
+
+<!-- ============ STAT STRIP ============ -->
+<div style="position: relative; height: 76px; flex-shrink: 0; background: #EEF0ED; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 17px; color: #2D3235">
+  <span aria-hidden="true" style="position: absolute; left: 0; bottom: 0; width: 1440px; height: 8px; background: repeating-linear-gradient(90deg, #C9CEC7 0 12px, transparent 12px 22px)"></span>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2F7A27" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.01"></path></svg>
+  <span><strong style="font-weight: 600">Driver error is the critical reason in 87% of truck crashes</strong> where the truck is at fault. <span style="color: #5E6569; font-size: 14px">(FMCSA LTCCS)</span></span>
+</div>
+
+<!-- ============ PROBLEM ============ -->
+<section id="problem" style="height: 1200px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; display: flex; flex-direction: column; justify-content: center; gap: 56px">
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 80px; align-items: center">
+    <div class="ytd-rv" style="display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #ffffff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">THE PROBLEM</span></div>
+      <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 56px; line-height: 1.05; letter-spacing: -1px">3:14 a.m. on I-70.<br><span style="color: #5E6569">Sixty seconds nobody is watching.</span></h2>
+      <p style="margin: 0; font-size: 19px; line-height: 1.6; color: #3F4548">Fatigue doesn't show up on a logbook. It builds quietly over a long clock, and by the time a camera or a scorecard notices, the damage is done. Drivers feel it first, and nothing in the cab is listening.</p>
+    </div>
+    <div class="ytd-rv2" style="display: flex; flex-direction: column; gap: 0; padding-left: 8px">
+      <div style="display: flex; gap: 22px">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 20px"><span style="width: 18px; height: 18px; border-radius: 9px; background: #409C35; flex-shrink: 0"></span><span style="width: 0; flex-grow: 1; border-left: 4px dashed #C9CEC7"></span></div>
+        <div style="padding-bottom: 30px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.5px; color: #2F7A27">HOUR TEN</span><span style="font-size: 19px; font-weight: 600">Of a fourteen-hour clock.</span></div>
+      </div>
+      <div style="display: flex; gap: 22px">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 20px"><span style="width: 18px; height: 18px; border-radius: 9px; background: #409C35; flex-shrink: 0"></span><span style="width: 0; flex-grow: 1; border-left: 4px dashed #C9CEC7"></span></div>
+        <div style="padding-bottom: 30px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.5px; color: #2F7A27">LEGAL ON PAPER</span><span style="font-size: 19px; font-weight: 600">The ELD says he's fine.</span></div>
+      </div>
+      <div style="display: flex; gap: 22px">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 20px"><span style="width: 18px; height: 18px; border-radius: 9px; background: #F2B53A; flex-shrink: 0"></span><span style="width: 0; flex-grow: 1; border-left: 4px dashed #C9CEC7"></span></div>
+        <div style="padding-bottom: 30px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.5px; color: #8A6A12">THE BODY DISAGREES</span><span style="font-size: 19px; font-weight: 600">Nothing in the cab is listening.</span></div>
+      </div>
+      <div style="display: flex; gap: 22px">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 20px"><span style="width: 18px; height: 18px; border-radius: 9px; background: #D9534F; flex-shrink: 0"></span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.5px; color: #B03A36">THE RUMBLE STRIP</span><span style="font-size: 19px; font-weight: 600">Catches him. This time.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between">
+      <h3 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 28px">Fatigue costs twice: once in crashes, again in the drivers who quit.</h3>
+      <span style="font-size: 15px; color: #5E6569">About $100B a year across the U.S.</span>
+    </div>
+    <div class="ytd-rv" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
+      <div class="ytd-lift" style="padding: 26px 24px; border-radius: 16px; background: #F3F4F2; border-top: 6px solid #D9534F; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 54px; line-height: 1">$3.6M</span>
+        <span style="font-size: 16px; color: #3F4548; line-height: 1.45">per fatal truck crash</span>
+      </div>
+      <div class="ytd-lift" style="padding: 26px 24px; border-radius: 16px; background: #F3F4F2; border-top: 6px solid #F2B53A; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 54px; line-height: 1">$200K</span>
+        <span style="font-size: 16px; color: #3F4548; line-height: 1.45">per non-fatal incident</span>
+      </div>
+      <div class="ytd-lift" style="padding: 26px 24px; border-radius: 16px; background: #F3F4F2; border-top: 6px solid #409C35; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 54px; line-height: 1">69–90%</span>
+        <span style="font-size: 16px; color: #3F4548; line-height: 1.45">annual driver turnover at truckload fleets</span>
+      </div>
+      <div class="ytd-lift" style="padding: 26px 24px; border-radius: 16px; background: #F3F4F2; border-top: 6px solid #409C35; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 48px; line-height: 1.06">$8.2K–$20.7K</span>
+        <span style="font-size: 16px; color: #3F4548; line-height: 1.45">to replace a single driver</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ytd-rv" style="padding: 36px 40px; border-radius: 20px; background: #2D3235; display: flex; flex-direction: column; gap: 26px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 40px">
+      <h3 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.2; color: #ffffff">Today's tools watch the clock or the camera.<br><span style="color: #8FD384">None are built for the driver.</span></h3>
+      <span style="font-size: 15px; color: #AEB5B8; max-width: 360px; line-height: 1.5">Reactive, employer-owned, and felt as surveillance, which is why adoption stops at the cab door.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+      <div style="padding: 18px; border-radius: 12px; background: #3A4144; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #ffffff">Hours-of-Service logs</span><span style="font-size: 14px; color: #C6CCCF">Measure the clock, not the human.</span></div>
+      <div style="padding: 18px; border-radius: 12px; background: #3A4144; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #ffffff">AI dash cams</span><span style="font-size: 14px; color: #C6CCCF">Fire after the microsleep.</span></div>
+      <div style="padding: 18px; border-radius: 12px; background: #3A4144; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #ffffff">Safety scorecards</span><span style="font-size: 14px; color: #C6CCCF">Punish the outcome, weeks late.</span></div>
+      <div style="padding: 18px; border-radius: 12px; background: #3A4144; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #ffffff">Caffeine and cold air</span><span style="font-size: 14px; color: #C6CCCF">Free, universal, useless.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLATFORM ============ -->
+<section id="platform" style="position: relative; height: 720px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; background: #F3F4F2; display: flex; flex-direction: column; justify-content: center; gap: 48px">
+  <svg style="position: absolute; left: 0; top: 0" width="1440" height="110" viewBox="0 0 1440 110" aria-hidden="true">
+    <path d="M0 0 H1440 V20 C1080 90 360 -10 0 60 Z" fill="#ffffff"></path>
+    <path class="ytd-d34" d="M0 76 C360 6 1080 106 1440 36" fill="none" stroke="#409C35" stroke-opacity="0.45" stroke-width="3" stroke-dasharray="18 16"></path>
+  </svg>
+  <div class="ytd-rv" style="display: flex; justify-content: space-between; align-items: flex-end; gap: 60px">
+    <div style="display: flex; flex-direction: column; gap: 20px; max-width: 680px">
+      <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #ffffff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">THE PLATFORM</span></div>
+      <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.08; letter-spacing: -0.8px">An app, plus the wearable already on their wrist.</h2>
+    </div>
+    <p style="margin: 0; max-width: 420px; font-size: 18px; line-height: 1.6; color: #3F4548">No cameras, no audio, nothing bolted to the truck. YouTheDriver runs on the driver's own phone and watch, so it goes wherever they go.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
+    <div class="ytd-rv ytd-hl" style="padding: 28px 26px; border-radius: 18px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 14px">
+      <span style="width: 52px; height: 52px; border-radius: 14px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="3"></rect><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2l1.5 1"></path></svg></span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.8px; color: #2F7A27">PREEMPT</span>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.25">Predicts fatigue from the wrist, before the drift.</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #3F4548">Sleep, heart rate and time since the last break roll into one live Green / Yellow / Red status, with a clear next step.</span>
+    </div>
+    <div class="ytd-rv2 ytd-hl" style="padding: 28px 26px; border-radius: 18px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 14px">
+      <span style="width: 52px; height: 52px; border-radius: 14px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z"></path><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4"></path></svg></span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.8px; color: #2F7A27">REWARD</span>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.25">Pays drivers for driving rested.</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #3F4548">Points, badges and real rewards for safe, healthy habits, spent on the things drivers actually need on the road.</span>
+    </div>
+    <div class="ytd-rv3 ytd-hl" style="padding: 28px 26px; border-radius: 18px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 14px">
+      <span style="width: 52px; height: 52px; border-radius: 14px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"></path></svg></span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.8px; color: #2F7A27">CONNECT</span>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.25">Ends 250 nights a year alone.</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #3F4548">Live parking, showers and fuel, plus peer intel from drivers in the same fleet and region.</span>
+    </div>
+    <div class="ytd-rv4 ytd-hl" style="padding: 28px 26px; border-radius: 18px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 14px">
+      <span style="width: 52px; height: 52px; border-radius: 14px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.8px; color: #2F7A27">ADVOCATE</span>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.25">Turns driver concerns into evidence.</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #3F4548">Log an issue by voice in seconds. YTD rolls it into reports that fleets can act on.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how" style="position: relative; height: 680px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; display: flex; flex-direction: column; justify-content: center; gap: 56px">
+  <svg style="position: absolute; left: 0; top: 0" width="1440" height="110" viewBox="0 0 1440 110" aria-hidden="true">
+    <path d="M0 0 H1440 V60 C1080 -10 360 90 0 20 Z" fill="#F3F4F2"></path>
+    <path class="ytd-d34" d="M0 36 C360 106 1080 6 1440 76" fill="none" stroke="#409C35" stroke-opacity="0.45" stroke-width="3" stroke-dasharray="18 16"></path>
+  </svg>
+  <div class="ytd-rv" style="display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+    <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #ffffff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">HOW IT WORKS</span></div>
+    <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.08; letter-spacing: -0.8px">Rolling in one shift.</h2>
+    <p style="margin: 0; max-width: 620px; font-size: 18px; line-height: 1.6; color: #3F4548">Nothing to install in the cab. The fleet enrolls, drivers pair their watch, and the app takes it from there.</p>
+  </div>
+  <div class="ytd-rv" style="position: relative; display: flex; flex-direction: column">
+    <div style="position: absolute; left: 0; top: 30px; width: 1200px; height: 44px; background: #2D3235; border-radius: 6px; overflow: hidden">
+      <svg style="position: absolute; left: 0; top: 0" width="1200" height="44" viewBox="0 0 1200 44" aria-hidden="true">
+        <line x1="0" y1="22" x2="1200" y2="22" stroke="#F2B53A" stroke-width="4" stroke-dasharray="22 30"></line>
+      </svg>
+      <span class="ytd-drive" style="position: absolute; left: 0; top: 24px; color: #ffffff; display: flex">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"></path><circle cx="6" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg>
+      </span>
+    </div>
+    <div style="position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 28px">
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px">
+        <span style="width: 64px; height: 100px; box-sizing: border-box; border-radius: 8px; background: #2F7A27; box-shadow: inset 0 0 0 3px #2F7A27, inset 0 0 0 5px #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px">MILE</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">1</span></span>
+        <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 19px">Fleet enrolls</span>
+        <span style="font-size: 15px; line-height: 1.5; color: #3F4548">A 15-minute enrollment session for the whole fleet.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px">
+        <span style="width: 64px; height: 100px; box-sizing: border-box; border-radius: 8px; background: #2F7A27; box-shadow: inset 0 0 0 3px #2F7A27, inset 0 0 0 5px #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px">MILE</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">2</span></span>
+        <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 19px">Pair the watch</span>
+        <span style="font-size: 15px; line-height: 1.5; color: #3F4548">Drivers connect the wearable they already own in about two minutes.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px">
+        <span style="width: 64px; height: 100px; box-sizing: border-box; border-radius: 8px; background: #2F7A27; box-shadow: inset 0 0 0 3px #2F7A27, inset 0 0 0 5px #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px">MILE</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">3</span></span>
+        <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 19px">Check in</span>
+        <span style="font-size: 15px; line-height: 1.5; color: #3F4548">A quick fatigue self-check before the shift starts.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px">
+        <span style="width: 64px; height: 100px; box-sizing: border-box; border-radius: 8px; background: #2F7A27; box-shadow: inset 0 0 0 3px #2F7A27, inset 0 0 0 5px #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px">MILE</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">4</span></span>
+        <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 19px">Drive with a heads-up</span>
+        <span style="font-size: 15px; line-height: 1.5; color: #3F4548">Green, Yellow or Red in real time, with a break or rest stop suggested early.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px">
+        <span style="width: 64px; height: 100px; box-sizing: border-box; border-radius: 8px; background: #2F7A27; box-shadow: inset 0 0 0 3px #2F7A27, inset 0 0 0 5px #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px">MILE</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 40px; line-height: 1">5</span></span>
+        <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 19px">Earn</span>
+        <span style="font-size: 15px; line-height: 1.5; color: #3F4548">Rested starts and on-time breaks add up to points and rewards.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APP SCREENS ============ -->
+<section id="app" style="position: relative; height: 1100px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; background: #2D3235; display: flex; flex-direction: column; justify-content: center; gap: 56px; overflow: hidden">
+  <svg style="position: absolute; left: 0; top: 0" width="1440" height="110" viewBox="0 0 1440 110" aria-hidden="true">
+    <polygon points="0,0 1440,0 0,70" fill="#ffffff"></polygon>
+    <line x1="0" y1="80" x2="1440" y2="10" stroke="#E9E9E9" stroke-opacity="0.3" stroke-width="3"></line>
+    <line class="ytd-d48" x1="0" y1="96" x2="1440" y2="26" stroke="#F2B53A" stroke-opacity="0.55" stroke-width="5" stroke-dasharray="20 28"></line>
+  </svg>
+  <svg style="position: absolute; left: 0; bottom: 0" width="1440" height="110" viewBox="0 0 1440 110" aria-hidden="true">
+    <line class="ytd-d48" x1="0" y1="84" x2="1440" y2="14" stroke="#F2B53A" stroke-opacity="0.55" stroke-width="5" stroke-dasharray="20 28"></line>
+    <line x1="0" y1="100" x2="1440" y2="30" stroke="#E9E9E9" stroke-opacity="0.3" stroke-width="3"></line>
+    <polygon points="0,110 1440,40 1440,110" fill="#EDF5EB"></polygon>
+  </svg>
+  <div class="ytd-rv" style="display: flex; justify-content: space-between; align-items: flex-end; gap: 60px">
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #E9E9E9; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">INSIDE THE APP</span></div>
+      <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.08; letter-spacing: -0.8px; color: #ffffff">A day inside YouTheDriver.</h2>
+    </div>
+    <p style="margin: 0; max-width: 440px; font-size: 18px; line-height: 1.6; color: #C6CCCF">Pair a wearable in two minutes. Everything else happens on the driver's own phone, from the first self-check to the last parking spot of the night.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px">
+    <!-- Parking -->
+    <div class="ytd-rv" style="display: flex; flex-direction: column; gap: 20px">
+      <div class="ytd-lift" style="width: 276px; height: 580px; box-sizing: border-box; border-radius: 40px; background: #1B1F21; padding: 9px">
+        <div style="width: 258px; height: 562px; box-sizing: border-box; border-radius: 31px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; padding: 20px 12px 12px; gap: 10px">
+          <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 17px">Parking ahead</span>
+          <span style="padding: 8px 10px; border-radius: 10px; background: #F3F4F2; font-size: 11px; color: #3F4548">I-70 W · next 60 miles</span>
+          <svg width="234" height="120" viewBox="0 0 234 120" style="border-radius: 12px; background: #E4EEE1" aria-hidden="true">
+            <path d="M-5 100 C 60 90, 90 40, 150 50 S 220 20, 240 10" fill="none" stroke="#ffffff" stroke-width="10"></path>
+            <path d="M-5 100 C 60 90, 90 40, 150 50 S 220 20, 240 10" fill="none" stroke="#C9CEC7" stroke-width="2" stroke-dasharray="6 6"></path>
+            <circle class="ytd-blink" cx="30" cy="95" r="7" fill="#2D3235"></circle>
+            <circle cx="104" cy="58" r="9" fill="#409C35"></circle><text x="104" y="62" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff" font-family="Barlow Condensed">P</text>
+            <circle cx="170" cy="44" r="9" fill="#F2B53A"></circle><text x="170" y="48" font-size="10" font-weight="700" text-anchor="middle" fill="#2D3235" font-family="Barlow Condensed">P</text>
+            <circle cx="218" cy="22" r="9" fill="#D9534F"></circle><text x="218" y="26" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff" font-family="Barlow Condensed">P</text>
+          </svg>
+          <div style="padding: 10px; border-radius: 12px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between"><span style="font-size: 12px; font-weight: 600">Rest area · 12 mi</span><span style="padding: 2px 8px; border-radius: 8px; background: #E4F1E1; color: #23601D; font-size: 10px; font-weight: 600">Open spaces</span></div>
+            <span style="font-size: 10px; color: #5E6569">Restrooms · Vending</span>
+          </div>
+          <div style="padding: 10px; border-radius: 12px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between"><span style="font-size: 12px; font-weight: 600">Truck stop · 31 mi</span><span style="padding: 2px 8px; border-radius: 8px; background: #FCEFCF; color: #6E540E; font-size: 10px; font-weight: 600">Filling up</span></div>
+            <span style="font-size: 10px; color: #5E6569">Showers · Diesel · Food</span>
+          </div>
+          <div style="padding: 10px; border-radius: 12px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between"><span style="font-size: 12px; font-weight: 600">Travel plaza · 52 mi</span><span style="padding: 2px 8px; border-radius: 8px; background: #F8DEDD; color: #8E2E2B; font-size: 10px; font-weight: 600">Full</span></div>
+            <span style="font-size: 10px; color: #5E6569">Showers · Diesel · Scale</span>
+          </div>
+          <span style="margin-top: auto; height: 34px; border-radius: 10px; background: #2F7A27; color: #ffffff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">Navigate to rest area</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.6px; color: #8FD384">PARKING</span><span style="font-size: 16px; color: #E9E9E9">Live spaces, showers and fuel ahead.</span></div>
+    </div>
+
+    <!-- Community -->
+    <div class="ytd-rv2" style="display: flex; flex-direction: column; gap: 20px">
+      <div class="ytd-lift" style="width: 276px; height: 580px; box-sizing: border-box; border-radius: 40px; background: #1B1F21; padding: 9px">
+        <div style="width: 258px; height: 562px; box-sizing: border-box; border-radius: 31px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; padding: 20px 12px 12px; gap: 10px">
+          <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 17px">Community</span>
+          <div style="display: flex; gap: 6px">
+            <span style="padding: 5px 10px; border-radius: 12px; background: #2D3235; color: #ffffff; font-size: 10px; font-weight: 600">My region</span>
+            <span style="padding: 5px 10px; border-radius: 12px; background: #F3F4F2; color: #3F4548; font-size: 10px; font-weight: 600">My fleet</span>
+            <span style="padding: 5px 10px; border-radius: 12px; background: #F3F4F2; color: #3F4548; font-size: 10px; font-weight: 600">I-70</span>
+          </div>
+          <div style="padding: 10px; border-radius: 12px; background: #F3F4F2; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px; height: 24px; border-radius: 12px; background: #409C35; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">RT</span><span style="font-size: 11px; font-weight: 600">Ray T. · 18 min ago</span></div>
+            <span style="font-size: 11px; line-height: 1.45; color: #2D3235">Lot at the truck stop off exit 104 is full already. Rest area 12 mi west still has room.</span>
+            <span style="font-size: 10px; color: #2F7A27; font-weight: 600">▲ Helpful</span>
+          </div>
+          <div style="padding: 10px; border-radius: 12px; background: #F3F4F2; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px; height: 24px; border-radius: 12px; background: #F2B53A; color: #2D3235; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">MK</span><span style="font-size: 11px; font-weight: 600">Maria K. · 1 hr ago</span></div>
+            <span style="font-size: 11px; line-height: 1.45; color: #2D3235">Construction slowdown eastbound near mile 90. Budget an extra 30.</span>
+            <span style="font-size: 10px; color: #2F7A27; font-weight: 600">▲ Helpful</span>
+          </div>
+          <div style="padding: 10px; border-radius: 12px; background: #F3F4F2; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; gap: 8px; align-items: center"><span style="width: 24px; height: 24px; border-radius: 12px; background: #2D3235; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">JB</span><span style="font-size: 11px; font-weight: 600">Jess B. · 3 hr ago</span></div>
+            <span style="font-size: 11px; line-height: 1.45; color: #2D3235">Anyone know a shower that's open late on this stretch?</span>
+            <span style="font-size: 10px; color: #5E6569">4 replies</span>
+          </div>
+          <span style="margin-top: auto; height: 34px; border-radius: 10px; border: 1.5px solid #2F7A27; color: #2F7A27; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">Share a road update</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.6px; color: #8FD384">COMMUNITY</span><span style="font-size: 16px; color: #E9E9E9">Peer intel by fleet and region.</span></div>
+    </div>
+
+    <!-- Wellness -->
+    <div class="ytd-rv3" style="display: flex; flex-direction: column; gap: 20px">
+      <div class="ytd-lift" style="width: 276px; height: 580px; box-sizing: border-box; border-radius: 40px; background: #1B1F21; padding: 9px">
+        <div style="width: 258px; height: 562px; box-sizing: border-box; border-radius: 31px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; padding: 20px 12px 12px; gap: 10px">
+          <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 17px">Wellness</span>
+          <div style="padding: 14px; border-radius: 14px; background: #2F7A27; color: #ffffff; display: flex; justify-content: space-between; align-items: center">
+            <div style="display: flex; flex-direction: column"><span style="font-size: 10px; opacity: 0.9">Your points</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.1">1,240</span></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end"><span style="font-size: 10px; opacity: 0.9">Green streak</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px">5 days</span></div>
+          </div>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; color: #3F4548">THIS WEEK</span>
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 11px"><span>Rested starts</span><span style="font-weight: 600">5 of 6</span></div><span style="height: 8px; border-radius: 4px; background: #E3E6E1; display: flex"><span class="ytd-fill" style="width: 83%; border-radius: 4px; background: #409C35"></span></span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 11px"><span>Breaks on time</span><span style="font-weight: 600">9 of 10</span></div><span style="height: 8px; border-radius: 4px; background: #E3E6E1; display: flex"><span class="ytd-fill" style="animation-delay: 0.65s; width: 90%; border-radius: 4px; background: #409C35"></span></span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 11px"><span>Water goal</span><span style="font-weight: 600">4 of 7</span></div><span style="height: 8px; border-radius: 4px; background: #E3E6E1; display: flex"><span class="ytd-fill" style="animation-delay: 0.8s; width: 57%; border-radius: 4px; background: #F2B53A"></span></span></div>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; color: #3F4548">BADGES</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+            <div style="padding: 8px 4px; border-radius: 10px; background: #F3F4F2; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #2F7A27"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg><span style="font-size: 9px; color: #2D3235; text-align: center">Well rested</span></div>
+            <div style="padding: 8px 4px; border-radius: 10px; background: #F3F4F2; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #2F7A27"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg><span style="font-size: 9px; color: #2D3235; text-align: center">On-time breaks</span></div>
+            <div style="padding: 8px 4px; border-radius: 10px; background: #F3F4F2; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #2F7A27"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"></path></svg><span style="font-size: 9px; color: #2D3235; text-align: center">Green week</span></div>
+          </div>
+          <span style="margin-top: auto; height: 34px; border-radius: 10px; background: #2F7A27; color: #ffffff; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">Redeem rewards</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.6px; color: #8FD384">WELLNESS</span><span style="font-size: 16px; color: #E9E9E9">Points, badges and real rewards.</span></div>
+    </div>
+
+    <!-- Advocacy -->
+    <div class="ytd-rv4" style="display: flex; flex-direction: column; gap: 20px">
+      <div class="ytd-lift" style="width: 276px; height: 580px; box-sizing: border-box; border-radius: 40px; background: #1B1F21; padding: 9px">
+        <div style="width: 258px; height: 562px; box-sizing: border-box; border-radius: 31px; background: #ffffff; overflow: hidden; display: flex; flex-direction: column; padding: 20px 12px 12px; gap: 10px">
+          <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 17px">Advocacy</span>
+          <div style="padding: 18px 12px; border-radius: 14px; background: #F3F4F2; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+            <span class="ytd-ring" style="width: 72px; height: 72px; border-radius: 36px; background: #409C35; box-shadow: 0 0 0 8px #D6EBD2; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></span>
+            <span style="font-size: 13px; font-weight: 600">Tap and talk</span>
+            <span style="font-size: 10px; color: #5E6569; line-height: 1.4">Say what's wrong. We turn it into a report your fleet can act on.</span>
+          </div>
+          <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; color: #3F4548">YOUR CONCERNS</span>
+          <div style="padding: 10px; border-radius: 12px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 600">Long dock wait at a shipper</span><span style="font-size: 10px; color: #23601D; font-weight: 600">Shared with fleet · Reviewed</span></div>
+          <div style="padding: 10px; border-radius: 12px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 600">Unlit lot, felt unsafe</span><span style="font-size: 10px; color: #6E540E; font-weight: 600">Shared with fleet · Open</span></div>
+          <div style="padding: 10px; border-radius: 12px; border: 1px solid #E3E6E1; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 12px; font-weight: 600">Route leaves no time for a real meal</span><span style="font-size: 10px; color: #5E6569">Trending with drivers in your region</span></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: 1.6px; color: #8FD384">ADVOCACY</span><span style="font-size: 16px; color: #E9E9E9">Log a concern by voice.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HEALTH & HABITS ============ -->
+<section id="health" style="height: 780px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; background: #EDF5EB; display: flex; align-items: center; gap: 80px">
+  <div class="ytd-rv" style="width: 620px; flex-shrink: 0; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #ffffff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">HEALTH &amp; HABITS</span></div>
+    <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.08; letter-spacing: -0.8px">Healthier drivers stay on the road longer.</h2>
+    <p style="margin: 0; font-size: 18px; line-height: 1.6; color: #3F4548">Irregular sleep, skipped breaks and truck-stop meals wear drivers down, and health and isolation lead the reasons they quit. YTD turns small daily habits into progress drivers can see, and rewards they can spend.</p>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 6px">
+      <div style="padding: 18px; border-radius: 14px; background: #ffffff; display: flex; gap: 14px">
+        <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: #D6EBD2; color: #23601D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"></path></svg></span>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Sleep</span><span style="font-size: 14px; line-height: 1.5; color: #3F4548">See how last night's rest sets up today's drive.</span></div>
+      </div>
+      <div style="padding: 18px; border-radius: 14px; background: #ffffff; display: flex; gap: 14px">
+        <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: #D6EBD2; color: #23601D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Breaks</span><span style="font-size: 14px; line-height: 1.5; color: #3F4548">A break timer and the nearest safe stop when alertness dips.</span></div>
+      </div>
+      <div style="padding: 18px; border-radius: 14px; background: #ffffff; display: flex; gap: 14px">
+        <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: #D6EBD2; color: #23601D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"></path></svg></span>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Fuel the body</span><span style="font-size: 14px; line-height: 1.5; color: #3F4548">Nudges toward water, protein and lighter meals on long stretches.</span></div>
+      </div>
+      <div style="padding: 18px; border-radius: 14px; background: #ffffff; display: flex; gap: 14px">
+        <span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: #D6EBD2; color: #23601D; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"></path></svg></span>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 16px">Stay connected</span><span style="font-size: 14px; line-height: 1.5; color: #3F4548">A driver community so the road feels less lonely.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ytd-rv3" style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px">
+    <div style="padding: 30px; border-radius: 22px; background: #2D3235; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.6px; color: #AEB5B8">SAFETY INTO DOLLARS</span>
+        <span style="padding: 4px 10px; border-radius: 10px; background: #409C35; color: #ffffff; font-size: 12px; font-weight: 600">+60 pts today</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; align-items: center; gap: 14px"><span style="width: 34px; height: 34px; border-radius: 17px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span><span style="flex-grow: 1; font-size: 16px; color: #ffffff">Pre-shift self-check</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #8FD384">+10</span></div>
+        <div style="display: flex; align-items: center; gap: 14px"><span style="width: 34px; height: 34px; border-radius: 17px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span><span style="flex-grow: 1; font-size: 16px; color: #ffffff">Took the break on Yellow</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #8FD384">+30</span></div>
+        <div style="display: flex; align-items: center; gap: 14px"><span style="width: 34px; height: 34px; border-radius: 17px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span><span style="flex-grow: 1; font-size: 16px; color: #ffffff">Hit the water goal</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #8FD384">+20</span></div>
+        <div style="display: flex; align-items: center; gap: 14px"><span style="width: 34px; height: 34px; border-radius: 17px; border: 2px dashed #6B7478; box-sizing: border-box"></span><span style="flex-grow: 1; font-size: 16px; color: #AEB5B8">7+ hours of sleep tonight</span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: #AEB5B8">+40</span></div>
+      </div>
+      <div style="padding-top: 18px; border-top: 1px solid #4B5357; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 14px; color: #AEB5B8">Redeem on road essentials</span>
+        <div style="display: flex; gap: 8px">
+          <span style="padding: 7px 14px; border-radius: 20px; background: #3A4144; color: #E9E9E9; font-size: 14px">Meals</span>
+          <span style="padding: 7px 14px; border-radius: 20px; background: #3A4144; color: #E9E9E9; font-size: 14px">Showers</span>
+          <span style="padding: 7px 14px; border-radius: 20px; background: #3A4144; color: #E9E9E9; font-size: 14px">Fuel</span>
+          <span style="padding: 7px 14px; border-radius: 20px; background: #3A4144; color: #E9E9E9; font-size: 14px">Gear</span>
+        </div>
+      </div>
+    </div>
+    <span style="font-size: 13px; color: #5E6569">Point values shown for illustration.</span>
+  </div>
+</section>
+
+<!-- ============ CARRIER + DRIVER RELATIONSHIP ============ -->
+<section id="carriers" style="position: relative; height: 960px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; display: flex; flex-direction: column; justify-content: center; gap: 48px">
+  <svg style="position: absolute; left: 0; top: 0" width="1440" height="110" viewBox="0 0 1440 110" aria-hidden="true">
+    <path d="M0 0 H1440 V20 C1080 90 360 -10 0 60 Z" fill="#EDF5EB"></path>
+    <path class="ytd-d34" d="M0 76 C360 6 1080 106 1440 36" fill="none" stroke="#409C35" stroke-opacity="0.45" stroke-width="3" stroke-dasharray="18 16"></path>
+  </svg>
+  <div class="ytd-rv" style="display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+    <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #ffffff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">DRIVERS + CARRIERS</span></div>
+    <h2 style="margin: 0; max-width: 820px; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.08; letter-spacing: -0.8px">Closing the gap between the cab and the office.</h2>
+    <p style="margin: 0; max-width: 700px; font-size: 18px; line-height: 1.6; color: #3F4548">Most safety tech makes drivers feel watched. YTD gives both sides something they want, so trust goes up instead of down.</p>
+  </div>
+  <div style="display: flex; align-items: stretch; gap: 0">
+    <div class="ytd-rvl ytd-hl" style="flex-grow: 1; flex-basis: 0; border-radius: 20px; border: 1px solid #DADDD8; overflow: hidden; display: flex; flex-direction: column">
+      <div style="padding: 20px 28px; background: #2D3235; display: flex; align-items: center; gap: 12px; color: #ffffff">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"></path><circle cx="6" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.6px">FOR THE DRIVER</span>
+      </div>
+      <div style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 18px">A voice that gets heard</span><span style="font-size: 15px; line-height: 1.55; color: #3F4548">Concerns logged by voice reach the fleet as evidence, not complaints.</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 18px">Paid to do it right</span><span style="font-size: 15px; line-height: 1.55; color: #3F4548">Rewards for rested starts and on-time breaks, not just penalties for mistakes.</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 18px">Your data stays yours</span><span style="font-size: 15px; line-height: 1.55; color: #3F4548">No cameras, no audio. Raw sleep and health details stay private.</span></div>
+      </div>
+    </div>
+    <div class="ytd-rv2" style="width: 120px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">
+      <span style="width: 0; height: 60px; border-left: 4px dashed #C9CEC7"></span>
+      <span class="ytd-pulse" style="width: 64px; height: 64px; border-radius: 32px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg></span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.8px; color: #2F7A27">TRUST</span>
+      <span style="width: 0; height: 60px; border-left: 4px dashed #C9CEC7"></span>
+    </div>
+    <div class="ytd-rvr ytd-hl" style="flex-grow: 1; flex-basis: 0; border-radius: 20px; border: 1px solid #DADDD8; overflow: hidden; display: flex; flex-direction: column">
+      <div style="padding: 20px 28px; background: #2F7A27; display: flex; align-items: center; gap: 12px; color: #ffffff">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01"></path></svg>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.6px">FOR THE CARRIER</span>
+      </div>
+      <div style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 18px">Step in early</span><span style="font-size: 15px; line-height: 1.55; color: #3F4548">See each driver's live fatigue status and push a break or reroute before an incident.</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 18px">Keep good drivers</span><span style="font-size: 15px; line-height: 1.55; color: #3F4548">Replacing one costs $8.2K–$20.7K. Showing you care about their health helps them stay.</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 600; font-size: 18px">Hear it from the road</span><span style="font-size: 15px; line-height: 1.55; color: #3F4548">Honest feedback on docks, parking and schedules, straight from the people driving them.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ytd-rv" style="padding: 24px 32px; border-radius: 18px; background: #F3F4F2; border: 1px solid #DADDD8; display: flex; align-items: center; gap: 40px">
+    <span style="width: 220px; flex-shrink: 0; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 20px; line-height: 1.25">What the fleet sees, and what stays private</span>
+    <div style="flex-grow: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+      <div style="display: flex; gap: 12px; align-items: flex-start"><span style="color: #2F7A27; flex-shrink: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></span><span style="font-size: 15px; line-height: 1.5; color: #3F4548"><strong style="color: #2D3235">Fleet sees</strong> each driver's live fatigue status.</span></div>
+      <div style="display: flex; gap: 12px; align-items: flex-start"><span style="color: #2F7A27; flex-shrink: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></span><span style="font-size: 15px; line-height: 1.5; color: #3F4548"><strong style="color: #2D3235">Stays private:</strong> raw sleep and health details.</span></div>
+      <div style="display: flex; gap: 12px; align-items: flex-start"><span style="color: #2F7A27; flex-shrink: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg></span><span style="font-size: 15px; line-height: 1.5; color: #3F4548"><strong style="color: #2D3235">Beyond YTD and the fleet:</strong> anonymized trends only.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHO IT'S FOR ============ -->
+<section id="who" style="position: relative; height: 780px; flex-shrink: 0; box-sizing: border-box; padding: 100px 120px; background: #F3F4F2; display: flex; flex-direction: column; justify-content: center; gap: 48px">
+  <svg style="position: absolute; left: 0; top: 0" width="1440" height="110" viewBox="0 0 1440 110" aria-hidden="true">
+    <path d="M0 0 H1440 V60 C1080 -10 360 90 0 20 Z" fill="#ffffff"></path>
+    <path class="ytd-d34" d="M0 36 C360 106 1080 6 1440 76" fill="none" stroke="#409C35" stroke-opacity="0.45" stroke-width="3" stroke-dasharray="18 16"></path>
+  </svg>
+  <div class="ytd-rv" style="display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+    <div style="display: flex"><span style="padding: 6px 12px; border-radius: 6px; background: #2F7A27; box-shadow: inset 0 0 0 2px #2F7A27, inset 0 0 0 4px #ffffff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1.6px; color: #ffffff">WHO IT'S FOR</span></div>
+    <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 46px; line-height: 1.08; letter-spacing: -0.8px">Built for everyone who shares the road.</h2>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+    <div class="ytd-rv ytd-hl" style="padding: 32px; border-radius: 20px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; border-radius: 12px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z"></path><circle cx="6" cy="18" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg></span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.6px; color: #2F7A27">DRIVERS</span></div>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 23px; line-height: 1.25">A heads-up before the drift, and rewards for driving rested.</span>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px; color: #3F4548">
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Works with the watch you already wear</span>
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>No cameras, no audio, your data</span>
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Parking, rewards and a driver community</span>
+      </div>
+      <a href="#drivers" class="ytd-btn" style="margin-top: auto; height: 52px; border-radius: 12px; background: #2F7A27; color: #ffffff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center">Join the driver waitlist</a>
+    </div>
+    <div class="ytd-rv2 ytd-hl" style="padding: 32px; border-radius: 20px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; border-radius: 12px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01"></path></svg></span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.6px; color: #2F7A27">FLEETS &amp; SAFETY DIRECTORS</span></div>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 23px; line-height: 1.25">Catch fatigue early and keep more of your drivers.</span>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px; color: #3F4548">
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Free pilot, 15-minute enrollment</span>
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Live fatigue dashboard for every pilot driver</span>
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Nothing to install in the truck</span>
+      </div>
+      <a href="#fleets" class="ytd-btn" style="margin-top: auto; height: 52px; border-radius: 12px; background: #2F7A27; color: #ffffff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center">Join the free fleet pilot</a>
+    </div>
+    <div class="ytd-rv3 ytd-hl" style="padding: 32px; border-radius: 20px; background: #ffffff; border: 1px solid #DADDD8; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; border-radius: 12px; background: #409C35; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg></span><span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 1.6px; color: #2F7A27">INSURERS &amp; BROKERS</span></div>
+      <span style="font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 23px; line-height: 1.25">Bring your trucking clients something new, at no cost.</span>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 15px; color: #3F4548">
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Anonymized insight into when and why losses happen</span>
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Fleets that actively manage fatigue risk</span>
+        <span style="display: flex; gap: 10px"><span style="color: #2F7A27">✓</span>Co-branded trucking case studies</span>
+      </div>
+      <a href="#partners" class="ytd-btn" style="margin-top: auto; height: 52px; border-radius: 12px; background: #2F7A27; color: #ffffff; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center">Partner with us</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section style="position: relative; height: 540px; flex-shrink: 0; background: #2D3235; overflow: hidden; display: flex; align-items: center; justify-content: center">
+  <svg style="position: absolute; left: 0; bottom: 0" width="1440" height="540" viewBox="0 0 1440 540" aria-hidden="true">
+    <polygon points="700,220 740,220 1140,540 300,540" fill="#363C3F"></polygon>
+    <line x1="700" y1="220" x2="300" y2="540" stroke="#E9E9E9" stroke-opacity="0.25" stroke-width="4"></line>
+    <line x1="740" y1="220" x2="1140" y2="540" stroke="#E9E9E9" stroke-opacity="0.25" stroke-width="4"></line>
+    <line class="ytd-d48" x1="720" y1="228" x2="720" y2="540" stroke="#F2B53A" stroke-opacity="0.5" stroke-width="7" stroke-dasharray="20 28"></line>
+  </svg>
+  <svg style="position: absolute; left: 0; top: 0" width="1440" height="100" viewBox="0 0 1440 100" aria-hidden="true">
+    <polygon points="0,0 1440,0 1440,60" fill="#F3F4F2"></polygon>
+    <line x1="0" y1="10" x2="1440" y2="70" stroke="#E9E9E9" stroke-opacity="0.3" stroke-width="3"></line>
+    <line class="ytd-d48" x1="0" y1="24" x2="1440" y2="84" stroke="#F2B53A" stroke-opacity="0.55" stroke-width="5" stroke-dasharray="20 28"></line>
+  </svg>
+  <div class="ytd-rv" style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; margin-top: 20px">
+    <img src="ytd-icon.png" alt="YouTheDriver logo" style="width: 76px; height: 69px">
+    <h2 style="margin: 0; font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 60px; line-height: 1.05; letter-spacing: -1.2px; color: #ffffff">It's YOU Behind the Wheel.</h2>
+    <p style="margin: 0; max-width: 640px; font-size: 19px; line-height: 1.6; color: #C6CCCF">Driver safety leads to earned dollars. Built from 152 conversations with drivers and fleet managers who live it every day.</p>
+    <div style="display: flex; gap: 14px">
+      <a href="#drivers" class="ytd-btn" style="display: inline-flex; align-items: center; height: 54px; padding: 0 24px; border-radius: 12px; background: #409C35; color: #ffffff; font-size: 16px; font-weight: 600">Join the driver waitlist</a>
+      <a href="#fleets" class="ytd-btn" style="display: inline-flex; align-items: center; height: 54px; padding: 0 24px; border-radius: 12px; background: #ffffff; color: #2D3235; font-size: 16px; font-weight: 600">Run a free fleet pilot</a>
+      <a href="#partners" class="ytd-btn" style="display: inline-flex; align-items: center; height: 54px; padding: 0 24px; border-radius: 12px; border: 2px solid #6B7478; color: #ffffff; font-size: 16px; font-weight: 600">Partner with us</a>
+    </div>
+    <span style="font-size: 15px; color: #AEB5B8">Talk to Brian Gaddie, CEO &amp; Founder · (317) 670-3308</span>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer style="position: relative; height: 120px; flex-shrink: 0; box-sizing: border-box; padding: 0 120px; background: #22272A; display: flex; align-items: center; justify-content: space-between">
+  <span aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 1440px; height: 8px; background: repeating-linear-gradient(90deg, #3A4144 0 12px, transparent 12px 22px)"></span>
+  <div style="display: flex; align-items: center; gap: 12px">
+    <img src="ytd-icon.png" alt="" style="width: 36px; height: 33px">
+    <span style="font-family: 'Rubik', sans-serif; font-weight: 800; font-size: 20px; color: #ffffff">YouThe<span style="color: #6CC25E">Driver</span></span>
+  </div>
+  <span style="font-size: 14px; color: #AEB5B8">No cameras. No cab surveillance. The driver owns the data.</span>
+  <span style="font-size: 14px; color: #AEB5B8">© 2026 YouTheDriver</span>
+</footer>
+
+</div>
+</body>
+</html>
